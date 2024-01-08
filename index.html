@@ -46,23 +46,27 @@
     <div class="circle" onclick="showText('Uczęszczam do klasy 3D (D jak dsuper klasa)')">Klasa</div>
     <div class="circle" onclick="showText('o.sopata.518@sltzn.katowice.pl')">Kontakt</div>
     <div class="circle" onclick="showText('mama kolegi nr.6')">Zainteresowania</div>
-    
-    <div class="circle" onclick="toggleLinks()">Zadania
-  <div id="links" class="links">
-    <a href="sciezka_do_pliku_4">zadanie4</a>
-    <a href="zad5.index.html">zadanie5</a>
-
-
-
-
-    <p id="displayText"></p>
+    <div class="circle" onclick="showText('zad 4, zad5')">
+      Zadania
+    </div>
 </div>
+
+<p id="displayText"></p>
 
 <script>
     function showText(text) {
         document.getElementById('displayText').innerText = text;
     }
+
+    function redirectToZad4() {
+        window.location.href = 'zadanie4.index.html';
+    }
+
+    function redirectToZad5() {
+        window.location.href = 'zadanko.index.html';
+    }
 </script>
 
 </body>
 </html>
+
