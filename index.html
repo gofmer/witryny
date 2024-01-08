@@ -46,22 +46,30 @@
     <div class="circle" onclick="showText('Uczęszczam do klasy 3D (D jak dsuper klasa)')">Klasa</div>
     <div class="circle" onclick="showText('o.sopata.518@sltzn.katowice.pl')">Kontakt</div>
     <div class="circle" onclick="showText('mama kolegi nr.6')">Zainteresowania</div>
-    <div class="circle" onclick="showText('zad 4, zad5'); redirectToZad4()">Zadania</div>
+
+
+    <div class="circle" onclick="toggleLinks()">Zadania
+        <div id="links" class="links">
+            <a href="javascript:void(0);" onclick="redirectToZad4()">Zadanie 4</a>
+            <a href="javascript:void(0);" onclick="redirectToZad5()">Zadanie 5</a>
+        </div>
+    </div>
 </div>
 
 <p id="displayText"></p>
 
 <script>
-    function showText(text) {
-        document.getElementById('displayText').innerText = text;
+    function toggleLinks() {
+        var linksDiv = document.getElementById('links');
+        linksDiv.style.display = (linksDiv.style.display === 'none') ? 'block' : 'none';
     }
 
     function redirectToZad4() {
-        window.location.href = 'zad4.index.html';
+        window.location.href = 'zadanie4.index.html';
     }
 
     function redirectToZad5() {
-        window.location.href = 'zad5.index.html';
+        window.location.href = 'zadanko.index.html';
     }
 </script>
 
