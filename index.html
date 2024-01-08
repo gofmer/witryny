@@ -47,6 +47,7 @@
             margin-bottom: 5px;
             color: #333;
             text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -57,7 +58,6 @@
     <div class="circle" onclick="showText('Uczęszczam do klasy 3D (D jak dsuper klasa)')">Klasa</div>
     <div class="circle" onclick="showText('o.sopata.518@sltzn.katowice.pl')">Kontakt</div>
     <div class="circle" onclick="showText('mama kolegi nr.6')">Zainteresowania</div>
-
 
     <div class="circle" onclick="toggleLinks()">Zadania
         <div id="links" class="links">
@@ -72,6 +72,10 @@
 <p id="displayText"></p>
 
 <script>
+    function showText(text) {
+        document.getElementById('displayText').innerText = text;
+    }
+
     function toggleLinks() {
         var linksDiv = document.getElementById('links');
         linksDiv.style.display = (linksDiv.style.display === 'none') ? 'block' : 'none';
@@ -84,12 +88,12 @@
     function redirectToZad5() {
         window.location.href = 'zad5.index.html';
     }
-    
-     function redirectToZad6() {
+
+    function redirectToZad6() {
         window.location.href = 'zad6.index.html';
     }
 
-     function redirectToZad7() {
+    function redirectToZad7() {
         window.location.href = 'zad7.index.html';
     }
 </script>
