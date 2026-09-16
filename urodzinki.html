@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sto Lat!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void: #0b0710;
+    --plum: #1d1226;
+    --plum-2: #2a1a3d;
+    --wine: #5a1533;
+    --lilac: #a98fc9;
+    --bone: #ece3d8;
+    --silver: #b9aec4;
+    --glow: #c9a6ff;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--void);
+    color: var(--bone);
+    font-family: 'Cormorant Garamond', serif;
+    overflow: hidden;
+  }
+
+  /* ---------- TŁO ZE ZDJĘCIAMI ---------- */
+  .bg-stage {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .bg-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 2.4s ease-in-out;
+}
+
+/* rozmyta wersja zdjęcia wypełnia cały ekran (bez pustych pasów) */
+.bg-photo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: inherit;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(35%) contrast(1.05) brightness(0.4) blur(28px);
+  transform: scale(1.15); /* żeby rozmycie nie pokazało krawędzi */
+}
+
+/* pełne, nieucięte zdjęcie na wierzchu */
+.bg-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: inherit;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: grayscale(35%) contrast(1.05) brightness(0.6);
+}
+
+  .bg-photo.active { opacity: 1; }
+
+  /* PODMIEŃ / DODAJ pliki poniżej -> patrz sekcja <script> na dole strony,
+     tablica "photos". Zostawione puste style tła jako przykład struktury. */
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at center, transparent 30%, rgba(11,7,16,0.55) 75%, rgba(11,7,16,0.92) 100%),
+      linear-gradient(180deg, rgba(11,7,16,0.65) 0%, rgba(11,7,16,0.15) 25%, rgba(11,7,16,0.15) 70%, rgba(11,7,16,0.85) 100%);
+  }
+
+  /* subtelna fioletowa mgiełka koloru */
+  .tint {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    mix-blend-mode: color;
+    background: linear-gradient(135deg, var(--plum-2), var(--wine));
+    opacity: 0.35;
+  }
+
+  /* ---------- EKRAN POWITALNY (przez politykę autoplay audio) ---------- */
+  #gate {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--void);
+    text-align: center;
+    transition: opacity 1s ease;
+  }
+
+  #gate.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .moon {
+    width: 92px;
+    height: 92px;
+    margin: 0 auto 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f3ecff, var(--lilac) 60%, var(--plum-2) 100%);
+    box-shadow: 0 0 40px 6px rgba(201,166,255,0.35);
+  }
+
+  .gate-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    color: var(--bone);
+    letter-spacing: 0.03em;
+    margin: 0 0 10px;
+  }
+
+  .gate-sub {
+    color: var(--silver);
+    font-size: 1.15rem;
+    font-style: italic;
+    margin-bottom: 34px;
+  }
+
+  .seal-btn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.04em;
+    color: var(--void);
+    background: linear-gradient(145deg, var(--glow), var(--lilac));
+    border: none;
+    padding: 14px 36px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(169,143,201,0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .seal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(169,143,201,0.5);
+  }
+
+  .seal-btn:active { transform: translateY(0); }
+
+  /* ---------- GŁÓWNA TREŚĆ ---------- */
+  .content {
+    position: relative;
+    z-index: 2;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6vh 6vw;
+  }
+
+  .card {
+    max-width: 620px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .eyebrow-cat {
+    font-size: 2.2rem;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 12px rgba(201,166,255,0.5));
+  }
+
+  h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    line-height: 1.15;
+    margin: 0 0 22px;
+    color: var(--bone);
+    text-shadow: 0 0 18px rgba(201,166,255,0.45), 0 0 44px rgba(90,21,51,0.55);
+  }
+
+  .wishes {
+    font-size: clamp(1.15rem, 2.2vw, 1.4rem);
+    line-height: 1.75;
+    color: var(--bone);
+    font-weight: 500;
+  }
+
+  .wishes p { margin: 0 0 20px; }
+
+  .wishes em {
+    color: var(--glow);
+    font-style: italic;
+  }
+
+  .signature {
+    margin-top: 30px;
+    font-style: italic;
+    color: var(--silver);
+    font-size: 1.2rem;
+    letter-spacing: 0.02em;
+  }
+
+  .divider {
+    width: 120px;
+    height: 1px;
+    margin: 26px auto;
+    background: linear-gradient(90deg, transparent, var(--lilac), transparent);
+  }
+
+  /* czarny kot przemykający raz przez ekran */
+  .cat-walk {
+    position: fixed;
+    bottom: 6%;
+    left: -160px;
+    z-index: 3;
+    width: 130px;
+    opacity: 0.92;
+    animation: walk 14s linear 2.5s 1;
+    pointer-events: none;
+  }
+
+  @keyframes walk {
+    0%   { transform: translateX(0) scaleX(1); }
+    48%  { transform: translateX(52vw) scaleX(1); }
+    50%  { transform: translateX(52vw) scaleX(-1); }
+    100% { transform: translateX(-10vw) scaleX(-1); }
+  }
+
+  /* przycisk audio (mute/unmute) */
+  .audio-toggle {
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    z-index: 5;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(201,166,255,0.4);
+    background: rgba(29,18,38,0.7);
+    backdrop-filter: blur(6px);
+    color: var(--bone);
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 480px) {
+    .cat-walk { width: 90px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cat-walk { animation: none; display: none; }
+    .bg-photo { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= TŁO ================= -->
+  <div class="bg-stage" id="bgStage"></div>
+  <div class="tint"></div>
+  <div class="vignette"></div>
+
+  <!-- czarny kotek przemykający przez scenę -->
+  <svg class="cat-walk" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#0b0710">
+      <ellipse cx="90" cy="70" rx="55" ry="22"/>
+      <circle cx="150" cy="50" r="20"/>
+      <polygon points="138,36 144,18 150,38"/>
+      <polygon points="160,36 156,18 168,38"/>
+      <path d="M40 70 Q 5 30 20 5" stroke="#0b0710" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <rect x="55" y="82" width="8" height="16" rx="3"/>
+      <rect x="75" y="86" width="8" height="14" rx="3"/>
+      <rect x="105" y="86" width="8" height="14" rx="3"/>
+      <rect x="125" y="82" width="8" height="16" rx="3"/>
+    </g>
+    <circle cx="157" cy="48" r="2.2" fill="#c9a6ff"/>
+  </svg>
+
+  <!-- ================= EKRAN STARTOWY ================= -->
+  <div id="gate">
+    <div>
+      <div class="moon"></div>
+      <p class="gate-title">Dla najlepszej michaliny jaką znam</p>
+      <p class="gate-sub">(tak, nie znam innej, ale to nie ważne)</p>
+      <button class="seal-btn" onclick="startExperience()">✦ Kliknij mnie :3 ✦</button>
+    </div>
+  </div>
+
+  <!-- ================= TREŚĆ / ŻYCZENIA ================= -->
+  <div class="content">
+    <div class="card">
+      <div class="eyebrow-cat">🖤🐈‍⬛🕯️</div>
+      <h1>Wszystkiego Najlepszego<br>z Okazji Urodzin</h1>
+
+      <div class="wishes">
+        <p>Nie jestem dobry w życzenia, bo mój słownik jest ubogi, mam problemy z gadaniem bo jestem lekko upośledzony, ale wiedz że są one na pewno szczere </p>
+
+        <p>Życzę Ci <em>wszystkiego co sobie wymarzysz</em>.
+		Obyś była zdrowa, bo bez zdrowia jest chujnia, obyś miała hajs w kieszeni, żebyś jako prawdziwy student była najebana przez większość czasu i nie musiała wpierdzielać berlinek z tostami codziennie,
+		dużo uśmiechu bo do twarzy Ci z nim. Mam nadzieję, że następny rok będzie dla Ciebie lepszy i że będziesz szczęśliwa</p>
+
+        <p>Pamiętaj, że jesteś super osóbką i nie daj sobie wmówić że jest inaczej.
+		Jeszcze raz, wszystkiego najlepszego goth baddie 💅</p>
+      </div>
+
+      <div class="divider"></div>
+      <p class="signature">🖤</p>
+    </div>
+  </div>
+
+  <!-- przycisk wyciszania muzyki -->
+  <button class="audio-toggle" id="audioBtn" onclick="toggleMute()">🔊</button>
+
+  <!-- ================= AUDIO ================= -->
+  <!-- PODMIEŃ src na nazwę swojego pliku mp3, np. "muzyka.mp3",
+       i wrzuć plik do tego samego folderu co ten plik html -->
+  <audio id="bgAudio" loop>
+    <source src="taco.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    /* =========================================================
+       ZDJĘCIA W TLE
+       Wpisz tu nazwy swoich plików (umieść je w tym samym folderze
+       co ten plik html, albo w podfolderze np. "zdjecia/1.jpg").
+       Możesz dodać dowolną liczbę zdjęć.
+    ========================================================= */
+    const photos = [
+      "mis1.png",
+      "mis2.jpg",
+      "mis3.jpg",
+      "mis4.jpg",
+      "mis5.jpg",
+	  "mis6.jpg",
+    ];
+
+    const stage = document.getElementById('bgStage');
+    const slides = photos.map((src, i) => {
+      const div = document.createElement('div');
+      div.className = 'bg-photo' + (i === 0 ? ' active' : '');
+      div.style.backgroundImage = `url('${src}')`;
+      stage.appendChild(div);
+      return div;
+    });
+
+    let current = 0;
+    if (slides.length > 1) {
+      setInterval(() => {
+        slides[current].classList.remove('active');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active');
+      }, 5000);
+    }
+
+    /* =========================================================
+       AUDIO — start po kliknięciu (przeglądarki blokują autoplay
+       z dźwiękiem, dlatego jest ekran powitalny z przyciskiem)
+    ========================================================= */
+    const audio = document.getElementById('bgAudio');
+    const gate = document.getElementById('gate');
+    const audioBtn = document.getElementById('audioBtn');
+
+    function startExperience() {
+      audio.volume = 0.55;
+      audio.play().catch(() => {});
+      gate.classList.add('hidden');
+      setTimeout(() => { gate.style.display = 'none'; }, 1000);
+    }
+
+    function toggleMute() {
+      audio.muted = !audio.muted;
+      audioBtn.textContent = audio.muted ? '🔇' : '🔊';
+    }
+  </script>
+
+</body>
+</html>
